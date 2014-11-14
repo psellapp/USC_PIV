@@ -13,11 +13,10 @@ function [curlw,C,h] = vorticity_plot(x,y,u,v,cmin,cmax,cinc)
 % Outputs: C = contour matrix
 %          h = handle to contour object
 %          curlw = vorticity field
-% Modified by Xinjiang Xiang 8/16/13
-% Changed the x and y length in curl to make it fit other programme.
 
 
-curlw = curl(x(1,:)*4,y(:,1)*4,u,v); %curl of velocity field
+
+curlw = curl(x(1,:),y(:,1),u,v); %curl of velocity field
 %[C,h] = contourf(x,y,curlw,[cmin:cinc:-cinc,cinc:cinc:cmax]); %contour levels are set to exclude zero contour level
 colormap(jet);
 [C,h]=contour(x,y,curlw,-10:1:10);
