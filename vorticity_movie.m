@@ -2,7 +2,10 @@ function vorticity_movie(filename_stub,first_frame,last_frame,cam_frame_rate,cmi
 %
 % Create a movie of vorticity fields.
 %
-% Ver.1.0: Prabu Sellappan, 7/8/2013.
+% Created: Prabu Sellappan, 7/8/2013.
+%
+% Modified: - Prabu Sellappan, 11/13/2014
+%             Included comment to clarify required MATLAB functions
 %
 % Inputs: filename_stub = filename placeholder.
 %         first_frame,last_frame = first and last files in your file
@@ -13,6 +16,7 @@ function vorticity_movie(filename_stub,first_frame,last_frame,cam_frame_rate,cmi
 %         cam_frame_rate = camera frame rate, i.e., image acquisition rate
 %         cmin,cmax,cinc = check help section of vorticity_plot function
 %
+% Requires the custom MATLAB function extract_vel_from_vc7_ver2 to be on system path. 
 
 warning('Warn:Filesize','Video files produced by this function are uncompressed and, therefore, are EXTREMELY big!!')
 warning('Warn:Dropbox','Do not run this function on files stored on shared Dropbox folders. \n Dropbox will automatically try to sync it on every computer that is sharing this folder and make everyone very unhappy. \n Also, Trystan will yell at you through SMS, and rightfully so.')
