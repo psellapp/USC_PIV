@@ -1,7 +1,10 @@
 function [img,err] = read_raw_color(fname,nx,ny)
 
+% Read color RAW images and output IMSHOW compatible data 
 % usage: [img,err] = read_raw_color(fname,nx,ny)
+%
 % created : Prabu Sellappan, 7/5/2012. 
+% modified: PS, 11/14/2014      
 % reads in a raw image file containing RGB data, and formats to display properly using imshow
 % fname = name of the raw image file
 % nx, ny = number of pixels in the x and y directions
