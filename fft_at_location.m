@@ -1,4 +1,4 @@
-function [] = fft_at_location(stub,xpos,ypos,nframes,frame_rate,f_St,win_flag)
+function [] = fft_at_location(stub,xpos,ypos,nframes,frame_rate,f_St,x_min,x_max,win_flag)
 
 % Calculates the power spectrum from velocity data obtained at specified location.
 %
@@ -11,12 +11,15 @@ function [] = fft_at_location(stub,xpos,ypos,nframes,frame_rate,f_St,win_flag)
 % 
 % 3/25/2012, Prabu: Plot the power spectrum as a function of normalized
 % frequency.
+%
+% 12/3/2014, Prabu: Included option to set x-axis limits
 % 
 % Input parameters:
 %
 % stub - filename placeholder; xpos,ypos - position on PIV image that is of interest;
-% nframes - # of frames to process; frame_rate - camera frame rate [Hz],
-% f_St - Strouhal frequency,
+% nframes - # of frames to process; frame_rate - camera frame rate [fps],
+% f_St - Strouhal frequency, used to normalize frequency
+% x_min, x_max - x-axis limits
 % win_flag - set to 1 to apply Hann window, 0 to not use any windowing scheme 
 %
 % This function assumes that the first file has index value either 0 or 1.
@@ -80,11 +83,11 @@ fft_1 = fft_1(1:nfft/2);
 f = f/f_St;
 
 % figure(2);
-plot(f(12:end),fft_1(12:end),'k-','LineWidth',1.5);
+plot(f(1:end),fft_1(1:end),'k-','LineWidth',1.5);
 title(['Grid location: (' num2str(xpos) ',' num2str(ypos) ')']);
-xlim([0 4.5]);
-% xlabel('{\itF_R}','fontname','Times','fontsize',14)
-% ylabel('Magnitude [arbitrary units]','fontname','Times','fontsize',14)
+xlim([x_min x_max]);
+xlabel('{\itF_R}','fontname','Times','fontsize',14)
+ylabel('Magnitude [arbitrary units]','fontname','Times','fontsize',14)
 set(gca,'FontName','Times','fontsize',14,'LineWidth',0.25);
 clear;
 cd ..
