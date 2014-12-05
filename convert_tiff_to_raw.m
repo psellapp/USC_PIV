@@ -1,6 +1,6 @@
 function [err] = convert_tiff_to_raw(fileNameTIFF,fileNameRAW,deleteTIFF_flag)
 
-% Convert files from TIFF format to 8-bit uint RAW format 
+% Convert TIFF files to RAW (8-bit uint) 
 % Created: Prabu Sellappan, 11/07/2012
 % 
 % fileNameTIFF - name of TIFF file without extension; fileNameRAW - name of
