@@ -14,7 +14,7 @@ function [i,j] = locate_peak_subpixel_gauss(phi)
 % modified by Tait Pottebaum, June 2010
 % modified by Prabu Sellappan, 12/5/2014
 %
-% Gaussian peak fitting formula:
+% Uses Gaussian 3-point estimator. See: Pg. 160 of PIV: A Practical Guide (Raffel, Willert, Wereley, Kompenhans) Second Edition
 % 
 
 % locate largest value
