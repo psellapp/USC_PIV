@@ -1,7 +1,10 @@
 function [ss_info,phi_limits] = frame_phases(first,last,freq,frame_rate,nBins)
-% 
+%
+% Create and map phase values to frame numbers. Used by other functions for phase averaging
+%
 % created by:
 % Prabu Sellappan - August 2010
+% modified: Prabu Sellappan, 12/9/2014
 % 
 % usage:
 % [ss_info,phi_limits] = frame_phases(first,last,freq,frame_rate,nBins)
@@ -13,11 +16,6 @@ function [ss_info,phi_limits] = frame_phases(first,last,freq,frame_rate,nBins)
 % frame_rate - frame rate of data acquisition, in fps
 % nBins - # of bins for phase averaging
 
-if freq > 2.6 && freq < 3.23 %uses arbitrary values which might need to be modified based on results
-    freq = 0.5*freq;
-elseif freq > 3.23 && freq < 4.95
-    freq = freq/3;
-end
 framenums = first:2:last;
 ElapsedTime = (framenums-first)/frame_rate;
 phases = ElapsedTime * freq;
@@ -31,5 +29,4 @@ for i=1:nBins
     phi_limits(i,2) = i*phi_width;
     
 end
-
 end
