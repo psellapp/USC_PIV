@@ -2,7 +2,7 @@ function phase_avg_vel(freq,amp,nBins,nCycles,nFrames,fRate,D,U)
 %
 % Phase average the velocity fields and generate mean and rms velocity fields
 % for each phase. Velocities and spatial quantities are
-% non-dimensionalized using free-stream velocity and cylinder diameter.
+% non-dimensionalized using free-stream velocity and characteristic length scale.
 % 
 % created: Prabu Sellappan - 2/20/2012
 % 
@@ -16,7 +16,7 @@ function phase_avg_vel(freq,amp,nBins,nCycles,nFrames,fRate,D,U)
 %           wake mode synchronization
 % nFrames - # of frames to process. Assumes that the first frame is either 0 or 1
 % fRate - camera frame rate in fps
-% D - cylinder diameter; U - free-stream velocity (Units for D and U have to be
+% D - characteristic length scale; U - free-stream velocity (Units for D and U have to be
 % consistent with the units in the dpiv.par file used for processing). 
 %
 
