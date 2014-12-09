@@ -1,10 +1,13 @@
 function [phi_bins,ss_bins] = phase_averaged_vel_mod(ss_info,phi_limits,stub,ext,ndigits,avg_stub,rms_stub,avg_ext,rms_ext,D,U)
-% usage: [phi_bins,ss_bins] = phase_averaged_vel_5(ss_info,phi_limits,stub,ext,ndigits,avg_stub,rms_stub,avg_ext,rms_ext)
+% usage: [phi_bins,ss_bins] = phase_averaged_vel_mod(ss_info,phi_limits,stub,ext,ndigits,avg_stub,rms_stub,avg_ext,rms_ext)
 % finds the averaged velocity fields and saves to  files;
 % bins for averaging are specified in the function call by phi_limits; phi_bins and ss_bins are saved in a 
 % mat file named avg_stub.mat
 %
-% modified: Prabu Sellappan, 2/20/2012. 
+% modified: Prabu Sellappan, 12/8/2014
+%           updated comments.
+%
+%           Prabu Sellappan, 2/20/2012. 
 %           included code to non-dimensionalize spatial data using cylinder
 %           diameter D and velocity data using free-stream velocity U
 % 
