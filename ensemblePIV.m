@@ -81,7 +81,7 @@ for i=1:nensSets
     deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
 
     for j=1:(ensSize/2)
-        tic;
+%        tic;
 % The loop variable j goes from 1 to (ensSize/2) since both images A and B
 % are read into memory inside this loop to form the image pair. 
         filename1 = int2str(imgFilenum);
@@ -118,11 +118,11 @@ for i=1:nensSets
             kk=kk+xintwinSize;
         end
         clear imgA;clear imgB;
-        toc;
+%        toc;
     end
 %     #####################
 %  Debugging code-ignore!!
-    save('tem','phi');
+%    save('tem','phi');
 %     #####################
     for k=1:floor(XSize/xintwinSize)
         for l=1:floor(YSize/yintwinSize)
