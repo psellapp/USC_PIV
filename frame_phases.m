@@ -12,7 +12,7 @@ function [ss_info,phi_limits] = frame_phases(first,last,freq,frame_rate,nBins)
 % 
 % first - starting index value of frames
 % last - last index value of frames
-% freq - frequency of oscillation of cylinder, in Hz
+% freq - frequency of forcing, in Hz
 % frame_rate - frame rate of data acquisition, in fps
 % nBins - # of bins for phase averaging
 
