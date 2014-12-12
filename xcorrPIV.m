@@ -1,4 +1,4 @@
-function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,ensSize,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax)
+function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax)
 %  xcorrPIV     Perform cross correlation of RAW image data. Outputs displacement vectors.
 %               Matlab Signal Processing Toolbox is required.
 %
@@ -20,8 +20,6 @@ function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,ensSize,XimgSi
 % 
 %  fnameindexEnd - Ending index value of files to be processed.
 % 
-%  ensSize - Size of ensemble. Number of image files, not image pairs, in each ensemble. 
-% 
 %  XimgSize - Horizontal length of input RAW image in pixels.
 % 
 %  YimgSize - Vertical length of input RAW image in pixels.
@@ -42,21 +40,10 @@ YSize=ymax-ymin+1;
 if rem(nFiles,2)==1
     fstatus=0;
     error('Number of input files(nFiles) is odd. Number of RAW image files (nFiles) has to even in order to form image pairs');
-elseif rem(ensSize,2)==1
-    fstatus=0;
-    error('Input parameter (ensSize) is odd. Number of RAW images in each ensemble (ensSize) has to be even in order to form image pairs');
 elseif rem(YSize,yintwinSize)~=0
     warning('Check size of interrogation window along y-axis. Some part of image might not be processed'); 
 elseif rem(XSize,xintwinSize)~=0
     warning('Check size of interrogation window along x-axis. Some part of image might not be processed'); 
-elseif ensSize>nFiles
-    fstatus=0;
-    error('Ensemble size is larger than total number of images available');
-end
-
-if rem(nFiles,ensSize)~= 0
-    warning('Some RAW image files towards the end will not be processed. This is due to the ensemble size');
-    warning('If a complete ensemble set cannot be formed then, the files in the last, incomplete ensemble are discarded');
 end
 
 imgFilenum=fnameindexStart;
