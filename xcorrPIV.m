@@ -20,8 +20,6 @@ function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,ensSize,XimgSi
 % 
 %  fnameindexEnd - Ending index value of files to be processed.
 % 
-%  nFiles  - Total number of image files to be processed.
-% 
 %  ensSize - Size of ensemble. Number of image files, not image pairs, in each ensemble. 
 % 
 %  XimgSize - Horizontal length of input RAW image in pixels.
@@ -61,64 +59,55 @@ if rem(nFiles,ensSize)~= 0
     warning('If a complete ensemble set cannot be formed then, the files in the last, incomplete ensemble are discarded');
 end
 
-nensSets = floor(nFiles/ensSize);
-% nensSets - Number of ensemble sets. 
-% Depends on the ensemble size. If a complete ensemble set cannot be formed then the
-% remaining files at the end are not processed. 
-% 
 imgFilenum=fnameindexStart;
-% imgFilenum - variable used to increment through filename index inside
-%              loop.
+% imgFilenum - variable used to increment through filename index inside loop.
 
-for i=1:nensSets
-    phi=zeros(((2*xintwinSize)-1),((2*yintwinSize)-1),(XSize/xintwinSize),(YSize/yintwinSize));
-    
-%     Pre-allocate displacement arrays deltax(:,:) and deltay(:,:). These arrays
-%     contain the x and y displacements obtained by peak locating.
+% Preallocate  
+phi=zeros(((2*xintwinSize)-1),((2*yintwinSize)-1),(XSize/xintwinSize),(YSize/yintwinSize));    
 
-    deltax=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
-    deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
+% Pre-allocate displacement arrays deltax(:,:) and deltay(:,:). These arrays
+% contain the x and y displacements obtained by peak locating.
+deltax=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
+deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));\
 
-    for j=1:(ensSize/2)
+for j=1:(nFiles/2)
 %        tic;
-% The loop variable j goes from 1 to (ensSize/2) since both images A and B
+% The loop variable j goes from 1 to (nFiles/2) since both images A and B
 % are read into memory inside this loop to form the image pair. 
-        filename1 = int2str(imgFilenum);
-        filename2 = '.raw';
-        filename = [fname,filename1,filename2];
-%          Image A is read into memory by calling subfunction read_RAW_img
-        imgA = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
-        imgFilenum = imgFilenum + 1;
-        filename1 = int2str(imgFilenum);
-        filename2 = '.raw';
-        filename = [fname,filename1,filename2];
-%          Image B is read into memory by calling subfunction read_RAW_img
-        imgB = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
-        imgFilenum = imgFilenum + 1;
+    filename1 = int2str(imgFilenum);
+    filename2 = '.raw';
+    filename = [fname,filename1,filename2];
+% Image A is read into memory by calling subfunction read_RAW_img
+    imgA = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
+    imgFilenum = imgFilenum + 1;
+    filename1 = int2str(imgFilenum);
+    filename2 = '.raw';
+    filename = [fname,filename1,filename2];
+% Image B is read into memory by calling subfunction read_RAW_img
+    imgB = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
+    imgFilenum = imgFilenum + 1;
 % %         ###############################
 % %         Debugging code for testing phase - Ignore!! 
 %         im1=imgA; im2=imgB;
 %         fstatus=1;
 % %         ###############################
-        kk=1;
+    kk=1;
         
-        for k=1:floor(XSize/xintwinSize)
-            ll=1;
-            for l=1:floor(YSize/yintwinSize)
+    for k=1:floor(XSize/xintwinSize)
+        ll=1;
+        for l=1:floor(YSize/yintwinSize)
 % This loop calls the subfunction crosscorr and sends in the same
 % interrogation windows from images A and B as input parameters. 
 %  CALL CROSS CORRELATION FUNCTION . 
 
-                phi(:,:,k,l)=phi(:,:,k,l) +  crosscorr(imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));
-                
-                ll=ll+yintwinSize;
-                size(phi);
-            end
-            kk=kk+xintwinSize;
+            phi(:,:,k,l)= phi(:,:,k,l) + crosscorr(imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));                
+            ll=ll+yintwinSize;
+%            size(phi);
         end
-        clear imgA;clear imgB;
-%        toc;
+            kk=kk+xintwinSize;
     end
+    clear imgA;clear imgB;
+%   toc;
 %     #####################
 %  Debugging code-ignore!!
 %    save('tem','phi');
@@ -128,8 +117,8 @@ for i=1:nensSets
             [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l))
         end 
     end
-    filename1=int2str(i);
-    filename2='ensSet_';
+    filename1=int2str(imgFilenum-2);
+    filename2=fname;
     filename3='.piv';
     filename4='x_';
     filename5='y_';
@@ -140,9 +129,8 @@ for i=1:nensSets
 %     Convert the x and y displacement data to velocities using functions
 %     read_vel and write_vel
 % 
-
 end
-end
+end %function end
 
     function [ccorrMat] = crosscorr(imgAsubmat,imgBsubmat)
 %     crosscorr   Performs cross-correlation of interrogation windows from
