@@ -1,6 +1,6 @@
 function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision)
 %  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement vectors 
-%               and saves them with extension '.piv'. Matlab Signal Processing Toolbox is required.
+%               and saves them as Matlab matrix with extension '.mat'. Matlab Signal Processing Toolbox is required.
 %
 %  created: Prabu Sellappan, 12/10/2014
 %  modified: Prabu, 12/12/2014
@@ -90,7 +90,9 @@ for j=1:(nFiles/2)
 
             phi(:,:,k,l)= phi(:,:,k,l) + crosscorr(imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));                
             ll=ll+yintwinSize;
-%            size(phi);
+%             size(phi)
+%             k
+%             l
         end
             kk=kk+xintwinSize;
     end
@@ -102,14 +104,18 @@ for j=1:(nFiles/2)
 %     #####################
     for k=1:floor(XSize/xintwinSize)
         for l=1:floor(YSize/yintwinSize)
-            [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l));
+            [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l)); %locate correlation peak to sub-pixel accuracy 
+%             size(deltax)
+%             size(deltay)
+%             k
+%             l
         end 
     end
     filename1=int2str(imgFilenum-2);
     filename2=fname;
-    filename3='.piv';
-    filename4='x_';
-    filename5='y_';
+    filename3='.mat';
+    filename4='x_disp_vec_';
+    filename5='y_disp_vec_';
     filenamex=[filename4,filename2,filename1,filename3];
     filenamey=[filename5,filename2,filename1,filename3];
     save(filenamex,'deltax')
