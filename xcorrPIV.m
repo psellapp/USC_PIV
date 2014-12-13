@@ -1,4 +1,4 @@
-function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax)
+function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision)
 %  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement vectors 
 %               and saves them with extension '.piv'. Matlab Signal Processing Toolbox is required.
 %
@@ -33,12 +33,13 @@ function [fstatus] = xcorrPIV(fname,fnameindexStart,fnameindexEnd,XimgSize,YimgS
 %                        you want to process the entire image without
 %                        cropping.
 % 
+%  img_precision - precision of input image; look in camera specs. Usually 'uint8' or 'uint16' 
 
+fstatus=0;
 nFiles=fnameindexEnd-fnameindexStart+1;
 XSize=xmax-xmin+1; % XSize,Ysize - Size of image along x and y axis, that is actually processed
 YSize=ymax-ymin+1;
 if rem(nFiles,2)==1
-    fstatus=0;
     error('Number of input files(nFiles) is odd. Number of RAW image files (nFiles) has to even in order to form image pairs');
 elseif rem(YSize,yintwinSize)~=0
     warning('Check size of interrogation window along y-axis. Some part of image might not be processed'); 
@@ -55,7 +56,7 @@ phi=zeros(((2*xintwinSize)-1),((2*yintwinSize)-1),(XSize/xintwinSize),(YSize/yin
 % Pre-allocate displacement arrays deltax(:,:) and deltay(:,:). These arrays
 % contain the x and y displacements obtained by peak locating.
 deltax=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
-deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));\
+deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
 
 for j=1:(nFiles/2)
 %        tic;
@@ -65,13 +66,13 @@ for j=1:(nFiles/2)
     filename2 = '.raw';
     filename = [fname,filename1,filename2];
 % Image A is read into memory by calling subfunction read_RAW_img
-    imgA = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
+    imgA = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax,img_precision);
     imgFilenum = imgFilenum + 1;
     filename1 = int2str(imgFilenum);
     filename2 = '.raw';
     filename = [fname,filename1,filename2];
 % Image B is read into memory by calling subfunction read_RAW_img
-    imgB = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax);
+    imgB = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax,img_precision);
     imgFilenum = imgFilenum + 1;
 % %         ###############################
 % %         Debugging code for testing phase - Ignore!! 
@@ -101,7 +102,7 @@ for j=1:(nFiles/2)
 %     #####################
     for k=1:floor(XSize/xintwinSize)
         for l=1:floor(YSize/yintwinSize)
-            [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l))
+            [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l));
         end 
     end
     filename1=int2str(imgFilenum-2);
