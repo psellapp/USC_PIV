@@ -92,7 +92,7 @@ for j=1:(nFiles/2)
             % interrogation windows from images A and B as input parameters.
             %  CALL CROSS CORRELATION FUNCTION .
             
-            phi(:,:,k,l)= phi(:,:,k,l) + crosscorr(imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));
+            phi(:,:,k,l)= phi(:,:,k,l) + crosscorr(imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));
             ll=ll+yintwinSize;
             %             size(phi)
             %             k
