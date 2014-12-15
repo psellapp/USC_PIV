@@ -108,7 +108,8 @@ for j=1:(nFiles/2)
     %     #####################
     for l=1:floor(XSize/xintwinSize)
         for k=1:floor(YSize/yintwinSize)
-            [deltax(k,l),deltay(k,l)] =locate_peak_subpixel_gauss(phi(:,:,k,l)); %locate correlation peak to sub-pixel accuracy
+            [i_loc,j_loc] = locate_peak_subpixel_gauss(phi(:,:,k,l)); %locate correlation peak to sub-pixel accuracy
+            [deltax(k,l),deltay(k,l)] = index_to_delta_pix(i_loc,j_loc,xintwinSize,yintwinSize);
             %             size(deltax)
             %             size(deltay)
             %             k
