@@ -1,13 +1,15 @@
-function [fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision)
+function [filenamex,filenamey,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision)
 %  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement vectors
 %               and saves them as Matlab matrix with extension '.mat'. Matlab Signal Processing Toolbox is required.
 %
 %  created: Prabu Sellappan, 12/10/2014
 %  modified: Prabu, 12/12/2014
 %            Prabu, 12/13/2014
+%            Prabu, 12/30/2014 added option to output filenames
 %
 %  OUTPUT PARAMETERS
 %
+%  filenamex,filenamey - filenames of MAT-files containing displacement data 
 %  fstatus - Output value. Takes a value of either 1 or 0 depending on
 %            whether the function completed successfully(1) or failed(0).
 %
