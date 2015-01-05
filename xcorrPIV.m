@@ -1,15 +1,16 @@
-function [filenamex,filenamey,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision)
+function [filenamex,deltax,filenamey,deltay,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision,save_flag)
 %  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement vectors
-%               and saves them as Matlab matrix with extension '.mat'. Matlab Signal Processing Toolbox is required.
+%               and, optionally, saves them as Matlab matrices with extension '.mat'. Matlab Signal Processing Toolbox is required.
 %
 %  created: Prabu Sellappan, 12/10/2014
 %  modified: Prabu, 12/12/2014
 %            Prabu, 12/13/2014
 %            Prabu, 12/30/2014 added option to output filenames
+%            Prabu, 1/5/2015 added option to output, or save to disk, displacement fields
 %
 %  OUTPUT PARAMETERS
 %
-%  filenamex,filenamey - filenames of MAT-files containing displacement data 
+%  filenamex,filenamey - filenames of MAT-files containing displacement data
 %  fstatus - Output value. Takes a value of either 1 or 0 depending on
 %            whether the function completed successfully(1) or failed(0).
 %
@@ -40,6 +41,9 @@ function [filenamex,filenamey,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindex
 %                        cropping.
 %
 %  img_precision - precision of input image; look in camera specs. Usually 'uint8' or 'uint16'
+% 
+%  save_flag - set to 1 to save dispalcement fields to disk, set to 0 to
+%              prevent saving to disk
 
 fstatus=0;
 nFiles=fnameindexEnd-fnameindexStart+1;
@@ -121,8 +125,10 @@ for j=1:(nFiles/2)
     filename1=int2str(imgFilenum-2);
     filenamex=['x_disp_vec_' fname_stub filename1 '.mat'];
     filenamey=['y_disp_vec_' fname_stub filename1 '.mat'];
-    save(filenamex,'deltax')
-    save(filenamey,'deltay')
+    if save_flag
+        save(filenamex,'deltax')
+        save(filenamey,'deltay')
+    end
     %     Convert the x and y displacement data to velocities using pulse
     %     separation delta_t
     %
