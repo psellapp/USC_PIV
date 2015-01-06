@@ -1,16 +1,17 @@
-function [filenamex,deltax,filenamey,deltay,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision,save_flag)
-%  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement vectors
+function [filenameu,u_vel,filenamev,v_vel,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision,delta_t,pix_to_cm,save_flag)
+%  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement and velocity [cm/s] vectors
 %               and, optionally, saves them as Matlab matrices with extension '.mat'. Matlab Signal Processing Toolbox is required.
 %
 %  created: Prabu Sellappan, 12/10/2014
 %  modified: Prabu, 12/12/2014
 %            Prabu, 12/13/2014
 %            Prabu, 12/30/2014 added option to output filenames
-%            Prabu, 1/5/2015 added option to output, or save to disk, displacement fields
+%            Prabu, 1/5/2015 Major changes. Calculate velocity. Added option to output, or save to disk.
 %
 %  OUTPUT PARAMETERS
 %
-%  filenamex,filenamey - filenames of MAT-files containing displacement data
+%  filenameu,filenamev - filenames of MAT-files containing velocity data
+%  u_vel,v_vel - 2-D arrays of u and v velocities, in units of [cm/s]
 %  fstatus - Output value. Takes a value of either 1 or 0 depending on
 %            whether the function completed successfully(1) or failed(0).
 %
@@ -41,8 +42,12 @@ function [filenamex,deltax,filenamey,deltay,fstatus] = xcorrPIV(fname_stub,file_
 %                        cropping.
 %
 %  img_precision - precision of input image; look in camera specs. Usually 'uint8' or 'uint16'
-% 
-%  save_flag - set to 1 to save dispalcement fields to disk, set to 0 to
+%
+%  delta_t - pulse separation duration, in microseconds
+%
+%  pix_to_cm - pixels to length scaling factor, in pixels/cm
+%
+%  save_flag - set to 1 to save dispalcement and velocity fields to disk, set to 0 to
 %              prevent saving to disk
 
 fstatus=0;
@@ -84,13 +89,9 @@ for j=1:(nFiles/2)
     % Image B is read into memory by calling subfunction read_RAW_img
     imgB = read_RAW_img(filename,XimgSize,YimgSize,xmin,xmax,ymin,ymax,img_precision);
     imgFilenum = imgFilenum + 1;
-    % %         ###############################
-    % %         Debugging code for testing phase - Ignore!!
-    %         im1=imgA; im2=imgB;
-    %         fstatus=1;
-    % %         ###############################
-    kk=1;
     
+    % =============Perform cross-correlation to calculate displacement=========
+    kk=1; %loop variable init
     for l=1:floor(XSize/xintwinSize)
         ll=1;
         for k=1:floor(YSize/yintwinSize)
@@ -107,11 +108,7 @@ for j=1:(nFiles/2)
         kk=kk+xintwinSize;
     end
     clear imgA;clear imgB;
-    %   toc;
-    %     #####################
-    %  Debugging code-ignore!!
-    %    save('tem','phi');
-    %     #####################
+    
     for l=1:floor(XSize/xintwinSize)
         for k=1:floor(YSize/yintwinSize)
             [i_loc,j_loc] = locate_peak_subpixel_gauss(phi(:,:,k,l)); %locate correlation peak to sub-pixel accuracy
@@ -122,16 +119,22 @@ for j=1:(nFiles/2)
             %             l
         end
     end
+    % =========================================================================
+    
+    % ============convert pixels to cm==========
+    deltax = deltax./pix_to_cm;
+    deltay = deltay./pix_to_cm;
+    % ==========================================
     filename1=int2str(imgFilenum-2);
-    filenamex=['x_disp_vec_' fname_stub filename1 '.mat'];
-    filenamey=['y_disp_vec_' fname_stub filename1 '.mat'];
     if save_flag
+        filenamex=[fname_stub filename1 '_x_disp' '.mat'];
+        filenamey=[fname_stub filename1 '_y_disp' '.mat'];
         save(filenamex,'deltax')
         save(filenamey,'deltay')
     end
-    %     Convert the x and y displacement data to velocities using pulse
-    %     separation delta_t
-    %
+    % ============convert displacement to velocity=========
+    [filenameu,u_vel,filenamev,v_vel,~] = disp2vel([fname_stub filename1],deltax,deltay,delta_t,save_flag);
+    % =====================================================
 end
 fstatus = 1;
 end %function end
