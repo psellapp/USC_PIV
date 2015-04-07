@@ -6,7 +6,7 @@ Note:
 
 [1] A good starting point would be xcorrPIV.m which performs the initial step of calculating displacement and velocity fields. 
 [2] All of the codes are written in Matlab. Signal Processing Toolbox is required for cross-correlation.  
-[3] The readimx4matlab libraries required to read image data acquired through DaVis are provided in this repo for your convenience. Thanks to LaVision ( http://www.lavision.de/en/ ) for making them available for free. Check them out for all of your PIV needs!
+[3] The readimx4matlab libraries required to read image data acquired through DaVis are provided in this repo for your convenience. Thanks to LaVision ( http://www.lavision.de/en/ ) for making them available for free. Check them out for all of your PIV needs.
 [4] Everything here is provided under the MIT license (So it's free, subject to certain conditions).  
 
 -Prabu Sellappan
