@@ -1,0 +1,6 @@
+Image size: 1024 X 768 pixels
+Bit Depth: 8
+dt: 0.00417s
+Length scaling: 18425 pix = 1 m
+
+Image pairing: t00_0.raw-t00_1.raw
