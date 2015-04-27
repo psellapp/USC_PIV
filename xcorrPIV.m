@@ -1,4 +1,4 @@
-function [filenameu,u_vel,filenamev,v_vel,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision,delta_t,pix_to_cm,save_flag)
+function [filenameu,u_vel,filenamev,v_vel,x_grid,y_grid,fstatus] = xcorrPIV(fname_stub,file_ext,fnameindexStart,fnameindexEnd,XimgSize,YimgSize,xintwinSize,yintwinSize,xmin,xmax,ymin,ymax,img_precision,delta_t,pix_to_cm,percentOverlap,save_flag)
 %  xcorrPIV     Perform cross correlation of a series of RAW image pairs. Calculates displacement and velocity [cm/s] vectors
 %               and, optionally, saves them as Matlab matrices with extension '.mat'. Matlab Signal Processing Toolbox is required.
 %
@@ -6,12 +6,15 @@ function [filenameu,u_vel,filenamev,v_vel,fstatus] = xcorrPIV(fname_stub,file_ex
 %  modified: Prabu, 12/12/2014
 %            Prabu, 12/13/2014
 %            Prabu, 12/30/2014 added option to output filenames
-%            Prabu, 1/5/2015 Major changes. Calculate velocity. Added option to output, or save to disk.
-%
+%            Prabu, 1/5/2015 Major changes. Calculate velocity. Added option to output, or save to disk
+%            Prabu, 4/26/2015 -added option to include overlap of interrogation windows 
+%                             -generate and save spatial grid
+% 
 %  OUTPUT PARAMETERS
 %
 %  filenameu,filenamev - filenames of MAT-files containing velocity data
 %  u_vel,v_vel - 2-D arrays of u and v velocities, in units of [cm/s]
+%  x_grid, y_grid - spatial grid [in units of cm] generated using meshgrid 
 %  fstatus - Output value. Takes a value of either 1 or 0 depending on
 %            whether the function completed successfully(1) or failed(0).
 %
@@ -47,18 +50,23 @@ function [filenameu,u_vel,filenamev,v_vel,fstatus] = xcorrPIV(fname_stub,file_ex
 %
 %  pix_to_cm - pixels to length scaling factor, in pixels/cm
 %
+%  percentOverlap - Percentage (specify as non-negative integer, 0-99) overlap between interrogation windows
+%
 %  save_flag - set to 1 to save dispalcement and velocity fields to disk, set to 0 to
 %              prevent saving to disk
 
-fstatus=0;
 nFiles=fnameindexEnd-fnameindexStart+1;
 XSize=xmax-xmin+1; % XSize,Ysize - Size of image along x and y axis, that is actually processed
 YSize=ymax-ymin+1;
+percentOverlap = 1 - (percentOverlap/100); %convert to percentage shift
+N_y = floor(YSize/(yintwinSize*percentOverlap))-1; %number of rows in vector field
+N_x = floor(XSize/(xintwinSize*percentOverlap))-1; %number of columns in vector field
+
 if rem(nFiles,2)==1
     error('Number of input files(nFiles) is odd. Number of RAW image files (nFiles) has to even in order to form image pairs');
-elseif rem(YSize,yintwinSize)~=0
+elseif rem(YSize,yintwinSize*percentOverlap)~=0
     warning('Check size of interrogation window along y-axis. Some part of image might not be processed');
-elseif rem(XSize,xintwinSize)~=0
+elseif rem(XSize,xintwinSize*percentOverlap)~=0
     warning('Check size of interrogation window along x-axis. Some part of image might not be processed');
 end
 
@@ -72,12 +80,12 @@ for j=1:(nFiles/2)
     
     
     % Preallocate correlation matrix
-    phi=zeros(((2*yintwinSize)-1),((2*xintwinSize)-1),floor(YSize/yintwinSize),floor(XSize/xintwinSize));
+    phi = zeros(((2*yintwinSize)-1),((2*xintwinSize)-1),N_y,N_x);
     
     % Pre-allocate displacement arrays deltax(:,:) and deltay(:,:). These arrays
     % contain the x and y displacements obtained by peak locating.
-    deltax=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
-    deltay=zeros(floor(YSize/yintwinSize),floor(XSize/xintwinSize));
+    deltax = zeros(N_y,N_x);
+    deltay = deltax;
     
     filename1 = int2str(imgFilenum);
     filename = [fname_stub filename1 file_ext];
@@ -92,25 +100,31 @@ for j=1:(nFiles/2)
     
     % =============Perform cross-correlation to calculate displacement=========
     kk=1; %loop variable init
-    for l=1:floor(XSize/xintwinSize)
-        ll=1;
-        for k=1:floor(YSize/yintwinSize)
+    for l=1:N_x %Cycle through columns
+        
+        ll=1; %loop variable init
+              %variables kk and ll are counters that track the absolute
+              %indices of interrogation windows  w.r.t. the entire image
+              
+        for k=1:N_y %Cycle through rows
             % This loop calls the subfunction crosscorr and sends in the same
             % interrogation windows from images A and B as input parameters.
             %  CALL CROSS CORRELATION FUNCTION .
             
             phi(:,:,k,l)= phi(:,:,k,l) + crosscorr(imgB((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))),imgA((ll:((ll+yintwinSize)-1)),(kk:((kk+xintwinSize)-1))));
-            ll=ll+yintwinSize;
-            %             size(phi)
-            %             k
-            %             l
+            ll=ll+floor(yintwinSize*percentOverlap);
+%              size(phi)
+%              k
+%              l
+%              kk
+%              ll
         end
-        kk=kk+xintwinSize;
+        kk=kk+floor(xintwinSize*percentOverlap);
     end
     clear imgA;clear imgB;
     
-    for l=1:floor(XSize/xintwinSize)
-        for k=1:floor(YSize/yintwinSize)
+    for l=1:N_x
+        for k=1:N_y
             [i_loc,j_loc] = locate_peak_subpixel_gauss(phi(:,:,k,l)); %locate correlation peak to sub-pixel accuracy
             [deltax(k,l),deltay(k,l)] = index_to_delta_pix(i_loc,j_loc,xintwinSize,yintwinSize);
             %             size(deltax)
@@ -136,6 +150,11 @@ for j=1:(nFiles/2)
     [filenameu,u_vel,filenamev,v_vel,~] = disp2vel([fname_stub filename1],deltax,deltay,delta_t,save_flag);
     % =====================================================
 end
+
+% =================Calculate spatial grid==================================
+[x_grid,y_grid]=meshgrid(linspace(0,XSize/pix_to_cm,N_x),linspace(0,YSize/pix_to_cm,N_y));
+save([fname_stub 'spatialgrid.mat'],'x_grid','y_grid') % save spatial grid to disk. Can be used with quiver function, etc
+% =========================================================================
 fstatus = 1;
 end %function end
 
