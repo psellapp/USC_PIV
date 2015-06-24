@@ -27,6 +27,7 @@ Umean=abs(Umean);
 
 Cd10 = zeros(1,lastFile-firstFile);
 Cd20 = Cd10;
+j = 1; %indexing variable to correctly loop through vector in case firstFile not equal to 1
 
 for i=firstFile:lastFile
     fname = [fname_stub num2str(i,'%03d') '.u']; %Check the formatSpec value in num2str if there's a problem with file read
@@ -37,9 +38,10 @@ for i=firstFile:lastFile
     [momentum10] = calcMomentum(u10corr,y2d,Umean);
     [momentum20] = calcMomentum(u20corr,y2d,Umean);
     
-    Cd10(i) = 2*momentum10/char_length_scale;
-    Cd20(i) = 2*momentum20/char_length_scale;
+    Cd10(j) = 2*momentum10/char_length_scale;
+    Cd20(j) = 2*momentum20/char_length_scale;
     
+    j = j+1;
 end
 
 disp('Vector field size:')
@@ -52,5 +54,10 @@ Cd10_std = std(Cd10)
 disp(['Coefficient of drag for mean profile ranging from columns ' num2str(range_cols2avg(3)) ' to ' num2str(range_cols2avg(4))])
 Cd20_mean = mean(Cd20)
 Cd20_std = std(Cd20)
-
+plot(Cd10,'-g+')
+hold on
+plot(Cd20,'-ro')
+hold off
+legend(['Columns ' num2str(range_cols2avg(1)) ' to ' num2str(range_cols2avg(2))],['Columns ' num2str(range_cols2avg(3)) ' to ' num2str(range_cols2avg(4))])
+ylabel('Cd')
 end
